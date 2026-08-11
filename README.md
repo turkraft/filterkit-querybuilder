@@ -26,6 +26,14 @@ fetch(`/api/cars?filter=${encodeURIComponent(expr)}`);
 npm install @turkraft/filterkit-querybuilder @turkraft/filterkit
 ```
 
+## Ecosystem
+
+See the other FilterKit integrations:
+
+- [TanStack](https://github.com/turkraft/filterkit-tanstack) — TanStack Table
+- [Prisma](https://github.com/turkraft/filterkit-prisma) — Prisma where clauses
+- [Drizzle](https://github.com/turkraft/filterkit-drizzle) — Drizzle where clauses
+
 ## Usage
 
 ```ts
