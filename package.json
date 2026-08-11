@@ -1,0 +1,52 @@
+{
+  "name": "@turkraft/filterkit-querybuilder",
+  "version": "1.0.0",
+  "description": "react-querybuilder integration for FilterKit — convert react-querybuilder queries to filter expressions for Spring Filter backends.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turkraft/filterkit-querybuilder.git"
+  },
+  "author": "Yusuf Torshid",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/turkraft/filterkit-querybuilder/issues"
+  },
+  "homepage": "https://github.com/turkraft/filterkit-querybuilder#readme",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "filterkit",
+    "react-querybuilder",
+    "query",
+    "builder",
+    "filter",
+    "spring-filter"
+  ],
+  "peerDependencies": {
+    "@turkraft/filterkit": "^1.0.0"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/torshid"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}
