@@ -15,7 +15,10 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm test
-      - run: node -e "const p=require('./package.json');p.version='${GITHUB_REF#refs/tags/v}';require('fs').writeFileSync('package.json',JSON.stringify(p,null,2)+'\n')"
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          npm version --no-git-tag-version ${GITHUB_REF#refs/tags/v}
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
