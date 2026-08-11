@@ -16,9 +16,11 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          npm version --no-git-tag-version ${GITHUB_REF#refs/tags/v}
+          npm version --no-git-tag-version $VERSION
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
