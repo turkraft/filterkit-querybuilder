@@ -1,6 +1,6 @@
 # FilterKit QueryBuilder
 
-[react-querybuilder](https://react-querybuilder.js.org/) integration for [FilterKit](https://github.com/turkraft/filterkit). Convert react-querybuilder queries to filter expressions for [Spring Filter](https://github.com/turkraft/springfilter) backends.
+[react-querybuilder](https://react-querybuilder.js.org/) integration for [FilterKit](https://github.com/turkraft/filterkit). Turn a react-querybuilder query into a filter expression you can send to your API.
 
 ```ts
 import { toFilterExpression } from '@turkraft/filterkit-querybuilder';
@@ -16,8 +16,6 @@ const query = {
 
 const expr = toFilterExpression(query);
 // => year between '2020' and '2025' and status in ['active', 'pending'] and name ~ '%John%'
-
-fetch(`/api/cars?filter=${encodeURIComponent(expr)}`);
 ```
 
 ## Install
@@ -37,7 +35,7 @@ See the other FilterKit integrations:
 ## Usage
 
 ```ts
-import { QueryBuilder, formatQuery } from 'react-querybuilder';
+import { QueryBuilder } from 'react-querybuilder';
 import { toFilterExpression } from '@turkraft/filterkit-querybuilder';
 
 function MyComponent() {
@@ -52,6 +50,9 @@ function MyComponent() {
   return <QueryBuilder query={query} onQueryChange={setQuery} />;
 }
 ```
+
+`toFilterExpression` returns `''` for an empty query — that means "no filter", so
+check for it before sending an empty `filter=` parameter.
 
 ## Operator mapping
 
@@ -73,7 +74,85 @@ function MyComponent() {
 | `between` | `field between 'a' and 'b'` |
 | `notBetween` | `not field between 'a' and 'b'` |
 
-Group combinators (`and`, `or`, `xor`) and negation (`not`) are preserved. Sub-groups are wrapped in parentheses.
+`in`, `notIn`, `between` and `notBetween` accept either an array or
+react-querybuilder's comma-separated string form.
+
+An operator outside this table throws, so a typo or a custom operator you have not
+mapped surfaces immediately instead of quietly becoming `=`. Pass
+`{ onUnknownOperator: 'skip' }` to drop those rules instead:
+
+```ts
+toFilterExpression(query, { onUnknownOperator: 'skip' });
+```
+
+## Groups
+
+Group combinators (`and`, `or`, `xor`) and negation (`not`) are preserved. A
+combinator outside those three throws; defaulting it to `and` would silently
+change the query, since `and` is not a subset of `xor`. A group with no
+combinator at all still means `and`.
+Sub-groups and negated groups are parenthesised, so the emitted expression means
+what the builder showed:
+
+```ts
+toFilterExpression({
+  combinator: 'and',
+  not: true,
+  rules: [
+    { field: 'a', operator: '=', value: 1 },
+    { field: 'b', operator: '=', value: 2 },
+  ],
+});
+// => not (a : '1' and b : '2')
+```
+
+### Independent combinators
+
+react-querybuilder's `RuleGroupTypeIC` puts a combinator string between each pair
+of rules. That shape is supported; rules are combined left to right and
+parenthesised where precedence requires it:
+
+```ts
+toFilterExpression({
+  rules: [
+    { field: 'a', operator: '=', value: 1 },
+    'or',
+    { field: 'b', operator: '=', value: 2 },
+    'and',
+    { field: 'c', operator: '=', value: 3 },
+  ],
+});
+// => (a : '1' or b : '2') and c : '3'
+```
+
+## Comparing two fields
+
+A rule with `valueSource: 'field'` compares against another column rather than a
+literal:
+
+```ts
+toFilterExpression({
+  combinator: 'and',
+  rules: [{ field: 'startDate', operator: '<=', value: 'endDate', valueSource: 'field' }],
+});
+// => startDate <: endDate
+```
+
+## Caveats
+
+- Values are quoted; the backend converts them to each field's type.
+- `contains` / `beginsWith` / `endsWith` wrap the value in `%` without escaping, so
+  a `%` or `_` the user types becomes a wildcard. Sanitise the value first if that
+  matters for your endpoint.
+- The `in` / `between` string form splits on commas, so a value containing a comma
+  must be passed as an array.
+
+## Sending it to a Spring Boot API
+
+The expression syntax matches [Spring Filter](https://github.com/turkraft/springfilter),
+so the string this package produces can go straight into a `filter=` parameter on a
+Spring Boot endpoint. Nothing here depends on that — any API that understands the
+syntax works the same way.
 
 ## [Sponsors](https://github.com/sponsors/torshid)
 

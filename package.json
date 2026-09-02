@@ -26,6 +26,7 @@
   "homepage": "https://github.com/turkraft/filterkit-querybuilder#readme",
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc -p tsconfig.test.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
@@ -48,5 +49,6 @@
   "devDependencies": {
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
-  }
+  },
+  "sideEffects": false
 }
