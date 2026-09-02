@@ -10,34 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm run typecheck
-      - run: npm test
-
-  against-filterkit-main:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: turkraft/filterkit
-          path: .filterkit-main
+          path: .filterkit
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Build and link the unreleased core
+      - name: Build and link the core
         run: |
-          npm --prefix .filterkit-main ci
-          npm --prefix .filterkit-main run build
+          npm --prefix .filterkit ci
+          npm --prefix .filterkit run build
           rm -rf node_modules/@turkraft/filterkit
           mkdir -p node_modules/@turkraft
-          ln -s "$PWD/.filterkit-main" node_modules/@turkraft/filterkit
+          ln -s "$PWD/.filterkit" node_modules/@turkraft/filterkit
+      - run: npm run build
+      - run: npm run typecheck
       - run: npm test
